@@ -1,68 +1,45 @@
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
-// Helper class representing a Bogie
+// Supporting class to represent a Bogie
 class Bogie {
-    private String name;
-    private String type; // e.g., Passenger, Goods
+    private String type;
     private int capacity;
 
-    public Bogie(String name, String type, int capacity) {
-        this.name = name;
+    public Bogie(String type, int capacity) {
         this.type = type;
         this.capacity = capacity;
     }
 
-    public String getName() {
-        return name;
+    public int getCapacity() {
+        return capacity;
     }
 
     public String getType() {
         return type;
     }
-
-    @Override
-    public String toString() {
-        return String.format("Bogie{name='%s', type='%s', capacity=%d}", name, type, capacity);
-    }
 }
 
 public class TrainConsistManagementApp {
     public static void main(String[] args) {
-        // 1. User creates a list of bogies
+        // 1. Create a list of bogies
         List<Bogie> bogies = new ArrayList<>();
-        bogies.add(new Bogie("Sleeper", "Passenger", 72));
-        bogies.add(new Bogie("Sleeper", "Passenger", 72));
-        bogies.add(new Bogie("AC Chair", "Passenger", 40));
-        bogies.add(new Bogie("First Class", "Passenger", 24));
-        bogies.add(new Bogie("Rectangular", "Goods", 100));
-        bogies.add(new Bogie("Cylindrical", "Goods", 80));
+        bogies.add(new Bogie("Sleeper", 72));
+        bogies.add(new Bogie("AC Chair", 56));
+        bogies.add(new Bogie("First Class", 24));
+        bogies.add(new Bogie("Sleeper", 72));
 
-        System.out.println("--- Original Flat List of Bogies ---");
-        bogies.forEach(System.out::println);
+        // 2. Use Stream API to calculate total seating capacity
+        // - stream() converts the list into a stream
+        // - map() extracts the capacity values
+        // - reduce() sums the capacities using Integer::sum
+        int totalSeatingCapacity = bogies.stream()
+                .map(Bogie::getCapacity) // map(b -> b.getCapacity())
+                .reduce(0, Integer::sum);
 
-        // 2. System converts the list into a stream
-        // 3. groupingBy() collector is applied
-        // 4. Bogies are grouped into a Map where the key is the Bogie Name [cite: 1]
-        Map<String, List<Bogie>> groupedByName = bogies.stream()
-                .collect(Collectors.groupingBy(Bogie::getName));
-
-        // 5. Grouped result is displayed [cite: 1]
-        System.out.println("\n--- Grouped Bogies (By Name/Category) ---");
-        groupedByName.forEach((name, bogieList) -> {
-            System.out.println("Category: " + name + " | Count: " + bogieList.size());
-            bogieList.forEach(b -> System.out.println("  - " + b));
-        });
-
-        // Additional Example: Grouping by Broad Type (Passenger vs Goods) [cite: 1]
-        Map<String, List<Bogie>> groupedByType = bogies.stream()
-                .collect(Collectors.groupingBy(Bogie::getType));
-
-        System.out.println("\n--- Grouped Bogies (By Type: Passenger vs Goods) ---");
-        groupedByType.forEach((type, list) -> {
-            System.out.println("Type: " + type + " (" + list.size() + " bogies)");
-        });
-
-        // 6. Program continues [cite: 1]
+        // 3. Display the total seating capacity
+        System.out.println("--- Train Consist Management: UC10 ---");
+        System.out.println("Total Bogies: " + bogies.size());
+        System.out.println("Total Seating Capacity: " + totalSeatingCapacity);
     }
 }
