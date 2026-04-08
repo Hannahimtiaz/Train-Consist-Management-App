@@ -1,55 +1,70 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-// Class representing a Goods Bogie
-class GoodsBogie {
-    private String type;
-    private String cargo;
+// Base class for Bogies
+class Bogie {
+    private String id;
+    private int capacity;
 
-    public GoodsBogie(String type, String cargo) {
-        this.type = type;
-        this.cargo = cargo;
+    public Bogie(String id, int capacity) {
+        this.id = id;
+        this.capacity = capacity;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public String getCargo() {
-        return cargo;
+    public int getCapacity() {
+        return capacity;
     }
 }
 
 public class TrainConsistManagementApp {
+
     public static void main(String[] args) {
-        System.out.println("==========================================");
-        System.out.println("UC12 - Safety Compliance Check for Goods Bogies");
-        System.out.println("==========================================\n");
-
-        // 1. User prepares a list of goods bogies
-        List<GoodsBogie> goodsBogies = new ArrayList<>();
-        goodsBogies.add(new GoodsBogie("Cylindrical", "Petroleum"));
-        goodsBogies.add(new GoodsBogie("Box", "Coal"));
-        goodsBogies.add(new GoodsBogie("Open", "Grain"));
-        goodsBogies.add(new GoodsBogie("Cylindrical", "Petroleum"));
-
-        // 2 & 3. Convert list to stream and use allMatch() for safety rules
-        // 4. Conditional logic: Cylindrical bogies must only carry Petroleum
-        boolean isSafe = goodsBogies.stream().allMatch(bogie -> {
-            if (bogie.getType().equalsIgnoreCase("Cylindrical")) {
-                return bogie.getCargo().equalsIgnoreCase("Petroleum");
-            }
-            return true; // Other bogie types have no cargo restrictions in this UC [cite: 1]
-        });
-
-        // 5 & 6. Display the result to the user [cite: 1]
-        if (isSafe) {
-            System.out.println("RESULT: The train is marked SAFE. All safety protocols passed.");
-        } else {
-            System.out.println("RESULT: The train is UNSAFE! Invalid cargo detected in cylindrical bogies.");
+        // 1. Prepare a collection of bogies
+        List<Bogie> bogies = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            bogies.add(new Bogie("B" + i, (int) (Math.random() * 100)));
         }
 
-        // 7. Program continues [cite: 1]
-        System.out.println("\nValidation complete. Program continues...");
+        System.out.println("--- Performance Benchmarking: Loop vs Streams ---");
+
+        // 2. Loop-Based Filtering [cite: 1]
+        long startLoop = System.nanoTime();
+        List<Bogie> loopFiltered = filterWithLoop(bogies, 60);
+        long endLoop = System.nanoTime();
+        long loopDuration = endLoop - startLoop;
+
+        // 3. Stream-Based Filtering [cite: 1]
+        long startStream = System.nanoTime();
+        List<Bogie> streamFiltered = filterWithStream(bogies, 60);
+        long endStream = System.nanoTime();
+        long streamDuration = endStream - startStream;
+
+        // Display results and execution times [cite: 1]
+        System.out.println("Loop Filtered Count: " + loopFiltered.size());
+        System.out.println("Loop Execution Time: " + loopDuration + " ns");
+
+        System.out.println("Stream Filtered Count: " + streamFiltered.size());
+        System.out.println("Stream Execution Time: " + streamDuration + " ns");
+
+        System.out.println("Results Match: " + (loopFiltered.size() == streamFiltered.size()));
+    }
+
+    // Logic for traditional loop filtering [cite: 1]
+    public static List<Bogie> filterWithLoop(List<Bogie> bogies, int threshold) {
+        List<Bogie> result = new ArrayList<>();
+        for (Bogie b : bogies) {
+            if (b.getCapacity() > threshold) {
+                result.add(b);
+            }
+        }
+        return result;
+    }
+
+    // Logic for stream-based filtering [cite: 1]
+    public static List<Bogie> filterWithStream(List<Bogie> bogies, int threshold) {
+        return bogies.stream()
+                .filter(b -> b.getCapacity() > threshold)
+                .collect(Collectors.toList());
     }
 }
