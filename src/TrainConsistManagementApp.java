@@ -1,63 +1,53 @@
-import java.util.ArrayList;
-import java.util.List;
-
-// Custom exception
-class InvalidCapacityException extends Exception {
-    public InvalidCapacityException(String message) {
-        super(message);
-    }
-}
-
-abstract class Bogie {
-    protected String type;
-    protected int capacity;
-
-    public Bogie(String type, int capacity) {
-        this.type = type;
-        this.capacity = capacity;
-    }
-
-    public String getType() { return type; }
-    public int getCapacity() { return capacity; }
-}
-
-class PassengerBogie extends Bogie {
-    public PassengerBogie(String type, int capacity) throws InvalidCapacityException {
-        super(type, capacity);
-        if (capacity <= 0) {
-            throw new InvalidCapacityException("Capacity must be greater than zero");
-        }
-    }
-}
-
+/**
+ * MAIN CLASS - TrainConsistManagementApp
+ * Use Case 15: Safe Cargo Assignment Using try-catch-finally
+ */
 public class TrainConsistManagementApp {
+
+    // 1. CUSTOM RUNTIME EXCEPTION (Static inner class)
+    static class CargoSafetyException extends RuntimeException {
+        public CargoSafetyException(String message) {
+            super(message);
+        }
+    }
+
+    // 2. GOODS BOGIE MODEL (Static inner class)
+    static class GoodsBogie {
+        private String shape;
+        private String cargoType;
+
+        public GoodsBogie(String shape) {
+            this.shape = shape;
+        }
+
+        public void assignCargo(String cargo) {
+            System.out.println("Attempting to assign " + cargo + " to " + shape + " bogie...");
+            try {
+                // Validation Rule: Petroleum cannot go in Rectangular bogies
+                if (shape.equalsIgnoreCase("Rectangular") && cargo.equalsIgnoreCase("Petroleum")) {
+                    throw new CargoSafetyException("SAFETY VIOLATION: Petroleum is unsafe for Rectangular bogies!");
+                }
+                this.cargoType = cargo;
+                System.out.println("SUCCESS: " + cargo + " assigned.");
+            } catch (CargoSafetyException e) {
+                System.err.println("CAUGHT: " + e.getMessage());
+            } finally {
+                System.out.println("LOG: Validation check finished.");
+                System.out.println("------------------------------------");
+            }
+        }
+    }
+
+    // 3. MAIN METHOD
     public static void main(String[] args) {
-        List<Bogie> trainConsist = new ArrayList<>();
+        // Test Case 1: Safe assignment
+        GoodsBogie b1 = new GoodsBogie("Cylindrical");
+        b1.assignCargo("Petroleum");
 
-        System.out.println("--- Train Consist Management ---");
+        // Test Case 2: Unsafe assignment (Triggers Exception)
+        GoodsBogie b2 = new GoodsBogie("Rectangular");
+        b2.assignCargo("Petroleum");
 
-        try {
-            PassengerBogie validBogie = new PassengerBogie("Sleeper", 72);
-            trainConsist.add(validBogie);
-            System.out.println("Added: " + validBogie.getType());
-        } catch (InvalidCapacityException e) {
-            System.out.println(e.getMessage());
-        }
-
-        try {
-            PassengerBogie zeroBogie = new PassengerBogie("AC Chair", 0);
-            trainConsist.add(zeroBogie);
-        } catch (InvalidCapacityException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-
-        try {
-            PassengerBogie negativeBogie = new PassengerBogie("First Class", -10);
-            trainConsist.add(negativeBogie);
-        } catch (InvalidCapacityException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-
-        System.out.println("Final size: " + trainConsist.size());
+        System.out.println("System remains operational after handling exceptions.");
     }
 }
