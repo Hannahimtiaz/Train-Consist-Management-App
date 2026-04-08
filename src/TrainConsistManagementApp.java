@@ -1,74 +1,80 @@
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TrainConsistManagementApp {
 
+    // Simulates the collection of bogie IDs in the train consist
+    private List<String> bogieIds;
+
+    public TrainConsistManagementApp() {
+        this.bogieIds = new ArrayList<>();
+    }
+
     /**
-     * Performs a binary search on the bogie IDs.
-     * Requirement: Input must be sorted. If not, it sorts the array first.
+     * Adds a bogie ID to the collection.
+     * @param bogieId The ID of the bogie to add.
      */
-    public static boolean searchBogie(String[] bogies, String searchKey) {
-        // Handle empty array case
-        if (bogies == null || bogies.length == 0) {
-            return false;
+    public void addBogie(String bogieId) {
+        bogieIds.add(bogieId);
+    }
+
+    /**
+     * Searches for a bogie ID.
+     * Implements UC20 requirements:
+     * 1. Check if collection is empty.
+     * 2. Throw IllegalStateException if empty.
+     * 3. Proceed with search if data exists.
+     */
+    public boolean searchBogie(String targetId) {
+        // Step 2 & 3: Defensive Programming / State Validation
+        if (bogieIds.isEmpty()) {
+            // Step 4: Throw IllegalStateException - Fail-Fast Principle
+            throw new IllegalStateException("Search operation failed: No bogies are available in the train consist.");
         }
 
-        // Ensure data is sorted before searching
-        Arrays.sort(bogies);
-
-        int low = 0;
-        int high = bogies.length - 1;
-
-        while (low <= high) {
-            // Compute middle index
-            int mid = low + (high - low) / 2;
-
-            // Compare key with mid element using compareTo()
-            int comparison = searchKey.compareTo(bogies[mid]);
-
-            if (comparison == 0) {
-                return true; // Match found
-            } else if (comparison < 0) {
-                high = mid - 1; // Search left half
-            } else {
-                low = mid + 1; // Search right half [cite: 1]
+        // Step 5: Proceed with search logic if validation passes
+        for (String id : bogieIds) {
+            if (id.equalsIgnoreCase(targetId)) {
+                return true;
             }
         }
-
-        return false; // Match not found [cite: 1]
+        return false;
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("--- Train Consist Management System (Binary Search) ---");
-
-        // Example workflow based on UC19 flow [cite: 1]
-        System.out.print("Enter Bogie IDs separated by commas (e.g., BG309,BG101,BG550): ");
-        String input = scanner.nextLine();
-
-        String[] bogies;
-        if (input.trim().isEmpty()) {
-            bogies = new String[0];
-        } else {
-            bogies = input.split(",");
-            for (int i = 0; i < bogies.length; i++) {
-                bogies[i] = bogies[i].trim();
-            }
+        // --- Test Scenario 1: Search Throws Exception When Empty ---
+        TrainConsistManagementApp appEmpty = new TrainConsistManagementApp();
+        System.out.println("Testing Case: Search Throws Exception When Empty");
+        try {
+            appEmpty.searchBogie("BG101");
+        } catch (IllegalStateException e) {
+            System.out.println("Caught Expected Exception: " + e.getMessage());
         }
+        System.out.println();
 
-        System.out.print("Enter the Bogie ID to search: ");
-        String searchKey = scanner.nextLine().trim();
+        // --- Test Scenario 2 & 3: Search Match Found After Validation ---
+        TrainConsistManagementApp appWithData = new TrainConsistManagementApp();
+        appWithData.addBogie("BG101");
+        appWithData.addBogie("BG205");
+        appWithData.addBogie("BG309");
 
-        // Perform optimized searching [cite: 1]
-        boolean found = searchBogie(bogies, searchKey);
+        System.out.println("Testing Case: Search Match Found (BG205)");
+        boolean found = appWithData.searchBogie("BG205");
+        System.out.println("Bogie Found: " + found);
+        System.out.println();
 
-        if (found) {
-            System.out.println("Result: Bogie " + searchKey + " found in the system.");
-        } else {
-            System.out.println("Result: Bogie " + searchKey + " not found.");
-        }
+        // --- Test Scenario 4: Search Match Not Found After Validation ---
+        System.out.println("Testing Case: Search Match Not Found (BG999)");
+        boolean notFound = appWithData.searchBogie("BG999");
+        System.out.println("Bogie Found: " + notFound);
+        System.out.println();
 
-        scanner.close();
+        // --- Test Scenario 5: Single Element Valid Case ---
+        TrainConsistManagementApp appSingle = new TrainConsistManagementApp();
+        appSingle.addBogie("BG101");
+        System.out.println("Testing Case: Single Element Search (BG101)");
+        System.out.println("Bogie Found: " + appSingle.searchBogie("BG101"));
+
+        System.out.println("\nUC20 execution completed...");
     }
 }
