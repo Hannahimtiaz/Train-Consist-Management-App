@@ -1,51 +1,74 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class TrainConsistManagementApp {
 
+    /**
+     * Performs a binary search on the bogie IDs.
+     * Requirement: Input must be sorted. If not, it sorts the array first.
+     */
+    public static boolean searchBogie(String[] bogies, String searchKey) {
+        // Handle empty array case
+        if (bogies == null || bogies.length == 0) {
+            return false;
+        }
+
+        // Ensure data is sorted before searching
+        Arrays.sort(bogies);
+
+        int low = 0;
+        int high = bogies.length - 1;
+
+        while (low <= high) {
+            // Compute middle index
+            int mid = low + (high - low) / 2;
+
+            // Compare key with mid element using compareTo()
+            int comparison = searchKey.compareTo(bogies[mid]);
+
+            if (comparison == 0) {
+                return true; // Match found
+            } else if (comparison < 0) {
+                high = mid - 1; // Search left half
+            } else {
+                low = mid + 1; // Search right half [cite: 1]
+            }
+        }
+
+        return false; // Match not found [cite: 1]
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // 1. User provides a list of bogie IDs
-        // Example list from test cases: {"BG101", "BG205", "BG309", "BG412", "BG550"}
-        String[] bogies = {"BG101", "BG205", "BG309", "BG412", "BG550"};
+        System.out.println("--- Train Consist Management System (Binary Search) ---");
 
-        System.out.println("Current Bogies in Consist: ");
-        for (String bogie : bogies) {
-            System.out.print(bogie + " ");
-        }
-        System.out.println("\n");
+        // Example workflow based on UC19 flow [cite: 1]
+        System.out.print("Enter Bogie IDs separated by commas (e.g., BG309,BG101,BG550): ");
+        String input = scanner.nextLine();
 
-        // 2. User provides a search key
-        System.out.print("Enter Bogie ID to search: ");
-        String searchKey = scanner.nextLine();
-
-        // Perform Linear Search
-        boolean found = performLinearSearch(bogies, searchKey);
-
-        // 6. Result is displayed
-        if (found) {
-            System.out.println("Bogie " + searchKey + " found in the consist.");
+        String[] bogies;
+        if (input.trim().isEmpty()) {
+            bogies = new String[0];
         } else {
-            System.out.println("Bogie " + searchKey + " not found in the consist.");
+            bogies = input.split(",");
+            for (int i = 0; i < bogies.length; i++) {
+                bogies[i] = bogies[i].trim();
+            }
+        }
+
+        System.out.print("Enter the Bogie ID to search: ");
+        String searchKey = scanner.nextLine().trim();
+
+        // Perform optimized searching [cite: 1]
+        boolean found = searchBogie(bogies, searchKey);
+
+        if (found) {
+            System.out.println("Result: Bogie " + searchKey + " found in the system.");
+        } else {
+            System.out.println("Result: Bogie " + searchKey + " not found.");
         }
 
         scanner.close();
-    }
-
-    /**
-     * Implements Linear Search logic to traverse the array sequentially.
-     * Key Concepts: Sequential Traversal, Equality Comparison, Early Termination.
-     */
-    public static boolean performLinearSearch(String[] arr, String key) {
-        // 3. System traverses the array sequentially
-        for (int i = 0; i < arr.length; i++) {
-            // 4. Each element is compared with the search key using equals() [cite: 1]
-            if (arr[i].equals(key)) {
-                // 5. If match found, search stops (Early Termination) [cite: 1]
-                return true;
-            }
-        }
-        // If the entire array is traversed and no match is found [cite: 1]
-        return false;
     }
 }
