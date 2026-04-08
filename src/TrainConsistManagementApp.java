@@ -1,45 +1,51 @@
-import java.util.ArrayList;
-import java.util.List;
-
-// Supporting class to represent a Bogie
-class Bogie {
-    private String type;
-    private int capacity;
-
-    public Bogie(String type, int capacity) {
-        this.type = type;
-        this.capacity = capacity;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public String getType() {
-        return type;
-    }
-}
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TrainConsistManagementApp {
     public static void main(String[] args) {
-        // 1. Create a list of bogies
-        List<Bogie> bogies = new ArrayList<>();
-        bogies.add(new Bogie("Sleeper", 72));
-        bogies.add(new Bogie("AC Chair", 56));
-        bogies.add(new Bogie("First Class", 24));
-        bogies.add(new Bogie("Sleeper", 72));
+        Scanner scanner = new Scanner(System.in);
 
-        // 2. Use Stream API to calculate total seating capacity
-        // - stream() converts the list into a stream
-        // - map() extracts the capacity values
-        // - reduce() sums the capacities using Integer::sum
-        int totalSeatingCapacity = bogies.stream()
-                .map(Bogie::getCapacity) // map(b -> b.getCapacity())
-                .reduce(0, Integer::sum);
+        // 1. Accept input for Train ID
+        System.out.print("Enter Train ID (Format: TRN-1234): ");
+        String trainId = scanner.nextLine();
 
-        // 3. Display the total seating capacity
-        System.out.println("--- Train Consist Management: UC10 ---");
-        System.out.println("Total Bogies: " + bogies.size());
-        System.out.println("Total Seating Capacity: " + totalSeatingCapacity);
+        // 2. Accept input for Cargo Code
+        System.out.print("Enter Cargo Code (Format: PET-AB): ");
+        String cargoCode = scanner.nextLine();
+
+        // --- DEFINE REGEX RULES ---
+        // TRN- followed by exactly 4 digits
+        String trainIdRegex = "TRN-\\d{4}";
+        // PET- followed by exactly 2 uppercase letters
+        String cargoCodeRegex = "PET-[A-Z]{2}";
+
+        System.out.println("\n--- Validation Results ---");
+
+        // 3. Validate Train ID
+        validateInput("Train ID", trainId, trainIdRegex);
+
+        // 4. Validate Cargo Code
+        validateInput("Cargo Code", cargoCode, cargoCodeRegex);
+
+        scanner.close();
+    }
+
+    /**
+     * Helper method to compile regex and match against input
+     */
+    private static void validateInput(String fieldName, String input, String regex) {
+        // Compile the regex pattern
+        Pattern pattern = Pattern.compile(regex);
+        // Create a matcher for the input string
+        Matcher matcher = pattern.matcher(input);
+
+        // Check if the entire input matches the pattern
+        if (matcher.matches()) {
+            System.out.println("✔ " + fieldName + " '" + input + "' is valid.");
+        } else {
+            System.out.println("❌ " + fieldName + " '" + input + "' is invalid.");
+            System.out.println("   (Requirement: Entire string must match the pattern exactly)");
+        }
     }
 }
