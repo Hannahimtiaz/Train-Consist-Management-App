@@ -1,41 +1,51 @@
-import java.util.Arrays;
+import java.util.Scanner;
 
 public class TrainConsistManagementApp {
 
     public static void main(String[] args) {
-        // Test Case 1: Basic Alphabetical Sorting
-        String[] bogies1 = {"Sleeper", "AC Chair", "First Class", "General", "Luxury"};
-        sortAndDisplay("Basic Alphabetical Sorting", bogies1);
+        Scanner scanner = new Scanner(System.in);
 
-        // Test Case 2: Unsorted Input Handling
-        String[] bogies2 = {"Luxury", "General", "Sleeper", "AC Chair"};
-        sortAndDisplay("Unsorted Input Handling", bogies2);
+        // 1. User provides a list of bogie IDs
+        // Example list from test cases: {"BG101", "BG205", "BG309", "BG412", "BG550"}
+        String[] bogies = {"BG101", "BG205", "BG309", "BG412", "BG550"};
 
-        // Test Case 3: Already Sorted Array
-        String[] bogies3 = {"AC Chair", "First Class", "General"};
-        sortAndDisplay("Already Sorted Array", bogies3);
+        System.out.println("Current Bogies in Consist: ");
+        for (String bogie : bogies) {
+            System.out.print(bogie + " ");
+        }
+        System.out.println("\n");
 
-        // Test Case 4: Duplicate Bogie Names
-        String[] bogies4 = {"Sleeper", "AC Chair", "Sleeper", "General"};
-        sortAndDisplay("Duplicate Bogie Names", bogies4);
+        // 2. User provides a search key
+        System.out.print("Enter Bogie ID to search: ");
+        String searchKey = scanner.nextLine();
 
-        // Test Case 5: Single Element Array Handling
-        String[] bogies5 = {"Sleeper"};
-        sortAndDisplay("Single Element Array Handling", bogies5);
+        // Perform Linear Search
+        boolean found = performLinearSearch(bogies, searchKey);
+
+        // 6. Result is displayed
+        if (found) {
+            System.out.println("Bogie " + searchKey + " found in the consist.");
+        } else {
+            System.out.println("Bogie " + searchKey + " not found in the consist.");
+        }
+
+        scanner.close();
     }
 
     /**
-     * Sorts the bogie array using Arrays.sort() and prints the result.
-     * Uses O(n log n) time complexity.
+     * Implements Linear Search logic to traverse the array sequentially.
+     * Key Concepts: Sequential Traversal, Equality Comparison, Early Termination.
      */
-    public static void sortAndDisplay(String testName, String[] bogies) {
-        System.out.println("Test Case: " + testName);
-        System.out.println("Before Sorting: " + Arrays.toString(bogies));
-
-        // Using Java's built-in optimized sorting utility
-        Arrays.sort(bogies);
-
-        System.out.println("After Sorting:  " + Arrays.toString(bogies));
-        System.out.println("--------------------------------------------");
+    public static boolean performLinearSearch(String[] arr, String key) {
+        // 3. System traverses the array sequentially
+        for (int i = 0; i < arr.length; i++) {
+            // 4. Each element is compared with the search key using equals() [cite: 1]
+            if (arr[i].equals(key)) {
+                // 5. If match found, search stops (Early Termination) [cite: 1]
+                return true;
+            }
+        }
+        // If the entire array is traversed and no match is found [cite: 1]
+        return false;
     }
 }
